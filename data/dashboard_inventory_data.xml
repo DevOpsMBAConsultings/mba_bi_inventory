@@ -6,16 +6,6 @@
     <record id="dashboard_inventory_operational" model="dashboard.dashboard">
         <field name="name">Inventario y Abastecimiento</field>
         <field name="menu_sequence">20</field>
-        <field name="grid_stack_dimensions">[
-            {"chartId": "ref('chart_kpi_stock_fisico')", "x": 0, "y": 0, "w": 3, "h": 2},
-            {"chartId": "ref('chart_kpi_deficit_negativo')", "x": 3, "y": 0, "w": 3, "h": 2},
-            {"chartId": "ref('chart_kpi_compras_transito')", "x": 6, "y": 0, "w": 3, "h": 2},
-            {"chartId": "ref('chart_kpi_inv_operativo')", "x": 9, "y": 0, "w": 3, "h": 2},
-            {"chartId": "ref('chart_compras_transito_dia')", "x": 0, "y": 2, "w": 6, "h": 4},
-            {"chartId": "ref('chart_deficit_por_categoria')", "x": 6, "y": 2, "w": 6, "h": 4},
-            {"chartId": "ref('chart_list_deficit_detalle')", "x": 0, "y": 6, "w": 6, "h": 4},
-            {"chartId": "ref('chart_list_transito_detalle')", "x": 6, "y": 6, "w": 6, "h": 4}
-        ]</field>
     </record>
 
     <!-- ========================================================
