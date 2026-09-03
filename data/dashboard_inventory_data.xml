@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- ========================================================
+         1. CREACIÓN DEL TABLERO DE INVENTARIO Y OPERACIONES
+         ======================================================== -->
+    <record id="dashboard_inventory_operational" model="dashboard.dashboard">
+        <field name="name">Inventario y Abastecimiento</field>
+        <field name="menu_sequence">20</field>
+        <field name="grid_stack_dimensions">[
+            {"chartId": "ref('chart_kpi_stock_fisico')", "x": 0, "y": 0, "w": 3, "h": 2},
+            {"chartId": "ref('chart_kpi_deficit_negativo')", "x": 3, "y": 0, "w": 3, "h": 2},
+            {"chartId": "ref('chart_kpi_compras_transito')", "x": 6, "y": 0, "w": 3, "h": 2},
+            {"chartId": "ref('chart_kpi_inv_operativo')", "x": 9, "y": 0, "w": 3, "h": 2},
+            {"chartId": "ref('chart_compras_transito_dia')", "x": 0, "y": 2, "w": 6, "h": 4},
+            {"chartId": "ref('chart_deficit_por_categoria')", "x": 6, "y": 2, "w": 6, "h": 4},
+            {"chartId": "ref('chart_list_deficit_detalle')", "x": 0, "y": 6, "w": 6, "h": 4},
+            {"chartId": "ref('chart_list_transito_detalle')", "x": 6, "y": 6, "w": 6, "h": 4}
+        ]</field>
+    </record>
+
+    <!-- ========================================================
+         2. KPIS PRINCIPALES (TARJETAS NUMÉRICAS)
+         ======================================================== -->
+
+    <!-- KPI 1: Físico en Bodega (Stock > 0) -->
+    <record id="chart_kpi_stock_fisico" model="dashboard.chart">
+        <field name="name">Físico en Bodega (Stock &gt; 0)</field>
+        <field name="dashboard_id" ref="dashboard_inventory_operational"/>
+        <field name="chart_type">kpi</field>
+        <field name="layout_type">layout1</field>
+        <field name="background_color">#E8F5E9</field>
+        <field name="font_color">#1B5E20</field>
+        <field name="model_id" search="[('model', '=', 'mba.bi.inventory.summary')]"/>
+        <field name="data_type">sum</field>
+        <field name="measurement_field_id" search="[('model_id.model', '=', 'mba.bi.inventory.summary'), ('name', '=', 'physical_value')]"/>
+        <field name="show_unit">1</field>
+        <field name="unit_type">monetary</field>
+    </record>
+
+    <!-- KPI 2: Déficit Vtas. Negativas -->
+    <record id="chart_kpi_deficit_negativo" model="dashboard.chart">
+        <field name="name">Déficit Vtas. Negativas</field>
+        <field name="dashboard_id" ref="dashboard_inventory_operational"/>
+        <field name="chart_type">kpi</field>
+        <field name="layout_type">layout1</field>
+        <field name="background_color">#FFEBEE</field>
+        <field name="font_color">#B71C1C</field>
+        <field name="model_id" search="[('model', '=', 'mba.bi.inventory.deficit')]"/>
+        <field name="data_type">sum</field>
+        <field name="measurement_field_id" search="[('model_id.model', '=', 'mba.bi.inventory.deficit'), ('name', '=', 'deficit_value')]"/>
+        <field name="show_unit">1</field>
+        <field name="unit_type">monetary</field>
+    </record>
+
+    <!-- KPI 3: Compras en Tránsito -->
+    <record id="chart_kpi_compras_transito" model="dashboard.chart">
+        <field name="name">Compras en Tránsito</field>
+        <field name="dashboard_id" ref="dashboard_inventory_operational"/>
+        <field name="chart_type">kpi</field>
+        <field name="layout_type">layout1</field>
+        <field name="background_color">#E3F2FD</field>
+        <field name="font_color">#0D47A1</field>
+        <field name="model_id" search="[('model', '=', 'mba.bi.purchase.transit')]"/>
+        <field name="data_type">sum</field>
+        <field name="measurement_field_id" search="[('model_id.model', '=', 'mba.bi.purchase.transit'), ('name', '=', 'transit_value')]"/>
+        <field name="show_unit">1</field>
+        <field name="unit_type">monetary</field>
+    </record>
+
+    <!-- KPI 4: Inv. Operativo Proyectado -->
+    <record id="chart_kpi_inv_operativo" model="dashboard.chart">
+        <field name="name">Inv. Operativo Proyectado</field>
+        <field name="dashboard_id" ref="dashboard_inventory_operational"/>
+        <field name="chart_type">kpi</field>
+        <field name="layout_type">layout1</field>
+        <field name="background_color">#E0F2F1</field>
+        <field name="font_color">#004D40</field>
+        <field name="model_id" search="[('model', '=', 'mba.bi.inventory.summary')]"/>
+        <field name="data_type">sum</field>
+        <field name="measurement_field_id" search="[('model_id.model', '=', 'mba.bi.inventory.summary'), ('name', '=', 'physical_value')]"/>
+        <field name="show_unit">1</field>
+        <field name="unit_type">monetary</field>
+    </record>
+
+    <!-- ========================================================
+         3. GRÁFICOS ANALÍTICOS (DÍA POR DÍA Y CATEGORÍAS)
+         ======================================================== -->
+
+    <!-- Gráfico 1: Compras en Tránsito por Día Previsto de Llegada -->
+    <record id="chart_compras_transito_dia" model="dashboard.chart">
+        <field name="name">Compras en Tránsito por Fecha Prevista</field>
+        <field name="dashboard_id" ref="dashboard_inventory_operational"/>
+        <field name="chart_type">column_chart</field>
+        <field name="model_id" search="[('model', '=', 'mba.bi.purchase.transit')]"/>
+        <field name="data_type">sum</field>
+        <field name="group_by_id" search="[('model_id.model', '=', 'mba.bi.purchase.transit'), ('name', '=', 'date_planned')]"/>
+        <field name="time_range">day</field>
+        <field name="measurement_field_ids" eval="[(6, 0, [ref('field_mba_bi_purchase_transit__transit_value', False) or search([('model_id.model', '=', 'mba.bi.purchase.transit'), ('name', '=', 'transit_value')]).id])]"/>
+        <field name="show_unit">1</field>
+        <field name="unit_type">monetary</field>
+    </record>
+
+    <!-- Gráfico 2: Déficit por Categoría de Producto -->
+    <record id="chart_deficit_por_categoria" model="dashboard.chart">
+        <field name="name">Déficit Negativo por Categoría</field>
+        <field name="dashboard_id" ref="dashboard_inventory_operational"/>
+        <field name="chart_type">bar_chart</field>
+        <field name="model_id" search="[('model', '=', 'mba.bi.inventory.deficit')]"/>
+        <field name="data_type">sum</field>
+        <field name="group_by_id" search="[('model_id.model', '=', 'mba.bi.inventory.deficit'), ('name', '=', 'categ_id')]"/>
+        <field name="measurement_field_ids" eval="[(6, 0, [ref('field_mba_bi_inventory_deficit__deficit_value', False) or search([('model_id.model', '=', 'mba.bi.inventory.deficit'), ('name', '=', 'deficit_value')]).id])]"/>
+        <field name="show_unit">1</field>
+        <field name="unit_type">monetary</field>
+    </record>
+
+    <!-- ========================================================
+         4. WIDGETS TIPO LISTA / DETALLE LÍNEA POR LÍNEA
+         ======================================================== -->
+
+    <!-- Lista 1: Detalle de Productos con Stock Negativo -->
+    <record id="chart_list_deficit_detalle" model="dashboard.chart">
+        <field name="name">Detalle de Productos con Déficit Negativo</field>
+        <field name="dashboard_id" ref="dashboard_inventory_operational"/>
+        <field name="chart_type">list</field>
+        <field name="list_type">standard</field>
+        <field name="model_id" search="[('model', '=', 'mba.bi.inventory.deficit')]"/>
+        <field name="limit_record">15</field>
+    </record>
+
+    <record id="list_field_deficit_prod" model="list.fields">
+        <field name="field_id" ref="chart_list_deficit_detalle"/>
+        <field name="sequence">1</field>
+        <field name="list_field_id" search="[('model_id.model', '=', 'mba.bi.inventory.deficit'), ('name', '=', 'product_id')]"/>
+    </record>
+    <record id="list_field_deficit_qty" model="list.fields">
+        <field name="field_id" ref="chart_list_deficit_detalle"/>
+        <field name="sequence">2</field>
+        <field name="list_field_id" search="[('model_id.model', '=', 'mba.bi.inventory.deficit'), ('name', '=', 'negative_qty')]"/>
+    </record>
+    <record id="list_field_deficit_cost" model="list.fields">
+        <field name="field_id" ref="chart_list_deficit_detalle"/>
+        <field name="sequence">3</field>
+        <field name="list_field_id" search="[('model_id.model', '=', 'mba.bi.inventory.deficit'), ('name', '=', 'cost')]"/>
+    </record>
+    <record id="list_field_deficit_val" model="list.fields">
+        <field name="field_id" ref="chart_list_deficit_detalle"/>
+        <field name="sequence">4</field>
+        <field name="list_field_id" search="[('model_id.model', '=', 'mba.bi.inventory.deficit'), ('name', '=', 'deficit_value')]"/>
+    </record>
+
+    <!-- Lista 2: Detalle de Compras en Tránsito -->
+    <record id="chart_list_transito_detalle" model="dashboard.chart">
+        <field name="name">Detalle de Órdenes en Tránsito</field>
+        <field name="dashboard_id" ref="dashboard_inventory_operational"/>
+        <field name="chart_type">list</field>
+        <field name="list_type">standard</field>
+        <field name="model_id" search="[('model', '=', 'mba.bi.purchase.transit')]"/>
+        <field name="limit_record">15</field>
+    </record>
+
+    <record id="list_field_trans_day" model="list.fields">
+        <field name="field_id" ref="chart_list_transito_detalle"/>
+        <field name="sequence">1</field>
+        <field name="list_field_id" search="[('model_id.model', '=', 'mba.bi.purchase.transit'), ('name', '=', 'date_planned_day')]"/>
+    </record>
+    <record id="list_field_trans_order" model="list.fields">
+        <field name="field_id" ref="chart_list_transito_detalle"/>
+        <field name="sequence">2</field>
+        <field name="list_field_id" search="[('model_id.model', '=', 'mba.bi.purchase.transit'), ('name', '=', 'order_id')]"/>
+    </record>
+    <record id="list_field_trans_partner" model="list.fields">
+        <field name="field_id" ref="chart_list_transito_detalle"/>
+        <field name="sequence">3</field>
+        <field name="list_field_id" search="[('model_id.model', '=', 'mba.bi.purchase.transit'), ('name', '=', 'partner_id')]"/>
+    </record>
+    <record id="list_field_trans_prod" model="list.fields">
+        <field name="field_id" ref="chart_list_transito_detalle"/>
+        <field name="sequence">4</field>
+        <field name="list_field_id" search="[('model_id.model', '=', 'mba.bi.purchase.transit'), ('name', '=', 'product_id')]"/>
+    </record>
+    <record id="list_field_trans_val" model="list.fields">
+        <field name="field_id" ref="chart_list_transito_detalle"/>
+        <field name="sequence">5</field>
+        <field name="list_field_id" search="[('model_id.model', '=', 'mba.bi.purchase.transit'), ('name', '=', 'transit_value')]"/>
+    </record>
+
+    <!-- ========================================================
+         5. GENERACIÓN AUTOMÁTICA DEL MENÚ Y ACCIÓN DE VISTA
+         ======================================================== -->
+    <function name="create_update_menu" model="dashboard.dashboard">
+        <value eval="[ref('dashboard_inventory_operational')]" />
+    </function>
+</odoo>

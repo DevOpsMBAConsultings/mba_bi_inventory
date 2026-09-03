@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ========================================================
+         VISTAS: DÉFICIT POR VENTAS NEGATIVAS
+         ======================================================== -->
+    <record id="view_mba_bi_inventory_deficit_tree" model="ir.ui.view">
+        <field name="name">mba.bi.inventory.deficit.list</field>
+        <field name="model">mba.bi.inventory.deficit</field>
+        <field name="arch" type="xml">
+            <list string="Déficit por Ventas Negativas" create="0" delete="0" edit="0">
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="location_id"/>
+                <field name="negative_qty" string="Cantidad Negativa" decoration-danger="1"/>
+                <field name="cost" widget="monetary"/>
+                <field name="deficit_value" string="Déficit Total ($)" sum="Total Déficit" widget="monetary" decoration-danger="1"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mba_bi_inventory_deficit_search" model="ir.ui.view">
+        <field name="name">mba.bi.inventory.deficit.search</field>
+        <field name="model">mba.bi.inventory.deficit</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Déficit">
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="location_id"/>
+                <group expand="1" string="Agrupar por">
+                    <filter string="Categoría" name="group_categ" context="{'group_by': 'categ_id'}"/>
+                    <filter string="Ubicación" name="group_location" context="{'group_by': 'location_id'}"/>
+                    <filter string="Compañía" name="group_company" context="{'group_by': 'company_id'}" groups="base.group_multi_company"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mba_bi_inventory_deficit" model="ir.actions.act_window">
+        <field name="name">Déficit por Ventas Negativas</field>
+        <field name="res_model">mba.bi.inventory.deficit</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_mba_bi_inventory_deficit_search"/>
+    </record>
+
+    <!-- ========================================================
+         VISTAS: COMPRAS EN TRÁNSITO POR DÍA
+         ======================================================== -->
+    <record id="view_mba_bi_purchase_transit_tree" model="ir.ui.view">
+        <field name="name">mba.bi.purchase.transit.list</field>
+        <field name="model">mba.bi.purchase.transit</field>
+        <field name="arch" type="xml">
+            <list string="Compras en Tránsito por Día" create="0" delete="0" edit="0">
+                <field name="date_planned_day" string="Día Previsto"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="qty_pending" string="Pendiente en Tránsito"/>
+                <field name="price_unit" widget="monetary"/>
+                <field name="transit_value" string="Monto en Tránsito ($)" sum="Total en Tránsito" widget="monetary" decoration-info="1"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_mba_bi_purchase_transit_search" model="ir.ui.view">
+        <field name="name">mba.bi.purchase.transit.search</field>
+        <field name="model">mba.bi.purchase.transit</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Compras en Tránsito">
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="date_planned_day"/>
+                <group expand="1" string="Agrupar por">
+                    <filter string="Día Previsto" name="group_date_day" context="{'group_by': 'date_planned_day'}"/>
+                    <filter string="Proveedor" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Orden de Compra" name="group_order" context="{'group_by': 'order_id'}"/>
+                    <filter string="Categoría" name="group_categ" context="{'group_by': 'categ_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_mba_bi_purchase_transit" model="ir.actions.act_window">
+        <field name="name">Compras en Tránsito</field>
+        <field name="res_model">mba.bi.purchase.transit</field>
+        <field name="view_mode">list</field>
+        <field name="search_view_id" ref="view_mba_bi_purchase_transit_search"/>
+    </record>
+</odoo>

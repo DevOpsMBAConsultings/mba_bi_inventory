@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mba_bi_inventory_deficit_user,mba.bi.inventory.deficit.user,model_mba_bi_inventory_deficit,base.group_user,1,0,0,0
+access_mba_bi_purchase_transit_user,mba.bi.purchase.transit.user,model_mba_bi_purchase_transit,base.group_user,1,0,0,0
+access_mba_bi_inventory_summary_user,mba.bi.inventory.summary.user,model_mba_bi_inventory_summary,base.group_user,1,0,0,0
