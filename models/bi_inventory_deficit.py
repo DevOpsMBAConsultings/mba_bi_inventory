@@ -29,8 +29,8 @@ class MbaBiInventoryDeficit(models.Model):
                     sq.location_id AS location_id,
                     sq.company_id AS company_id,
                     abs(sq.quantity) AS negative_qty,
-                    COALESCE(NULLIF(pp.standard_price, 0), pt.standard_price, 0.0) AS cost,
-                    abs(sq.quantity) * COALESCE(NULLIF(pp.standard_price, 0), pt.standard_price, 0.0) AS deficit_value
+                    COALESCE((pp.standard_price->>sq.company_id::text)::numeric, (pp.standard_price->>'1')::numeric, 0.0) AS cost,
+                    abs(sq.quantity) * COALESCE((pp.standard_price->>sq.company_id::text)::numeric, (pp.standard_price->>'1')::numeric, 0.0) AS deficit_value
                 FROM stock_quant sq
                 JOIN stock_location sl ON sl.id = sq.location_id
                 JOIN product_product pp ON pp.id = sq.product_id
